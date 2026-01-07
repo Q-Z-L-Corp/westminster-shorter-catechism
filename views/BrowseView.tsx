@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Star, Layers } from 'lucide-react';
-import { QuestionData, Language } from '../types';
-import { UI_TEXT } from '../constants';
+import { Search, Star } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 import { Card } from '../components/Card';
+import { UI_TEXT } from '../constants';
+import { Language, QuestionData } from '../types';
 
 export const BrowseView: React.FC<{
   data: QuestionData[];
@@ -43,7 +43,7 @@ export const BrowseView: React.FC<{
       {/* Filters Bar */}
       <div className="flex items-center justify-between mb-2">
         <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-          {filteredData.length} {filteredData.length === 1 ? 'Question' : 'Questions'}
+          {filteredData.length} {filteredData.length === 1 ? t.question : t.questions}
         </div>
         
         <button 

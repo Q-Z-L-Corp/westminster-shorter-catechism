@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  CheckCircle2, 
-  XCircle, 
-  ChevronLeft, 
+import {
+  ChevronLeft,
   ChevronRight,
-  RotateCcw,
-  Trophy,
   HelpCircle,
-  Volume2,
-  StopCircle
+  RotateCcw,
+  StopCircle,
+  Trophy,
+  Volume2
 } from 'lucide-react';
-import { QuestionData, Language } from '../types';
-import { UI_TEXT } from '../constants';
+import React, { useEffect, useState } from 'react';
 import { FormattedAnswer } from '../components/FormattedAnswer';
 import { ScriptureList } from '../components/ScriptureList';
+import { UI_TEXT } from '../constants';
 import { useSpeech } from '../hooks/useSpeech';
+import { Language, QuestionData } from '../types';
 
 export const QuizView: React.FC<{
   data: QuestionData[];
@@ -119,7 +117,7 @@ export const QuizView: React.FC<{
             {Math.round((correctCount / sessionQueue.length) * 100)}%
           </div>
           <p className="text-slate-500 mb-8">
-            {correctCount} correct out of {sessionQueue.length}
+            {correctCount} {t.correctOf} {sessionQueue.length}
           </p>
           <button
             onClick={startNewSession}
@@ -254,7 +252,7 @@ export const QuizView: React.FC<{
         </button>
 
         <span className="text-xs font-bold text-stone-300 uppercase tracking-widest">
-          {isFlipped ? 'Answer' : 'Question'}
+          {isFlipped ? t.answer : t.question}
         </span>
 
         <button 

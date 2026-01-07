@@ -27,6 +27,10 @@ export const UI_TEXT = {
     emptySaved: "No saved questions yet. Tap the star icon to bookmark questions for later study.",
     proofReference: "Proof Reference",
     tabToReviewAnswer: "Tap to Reveal Answer",
+    answer: "Answer",
+    question: "Question",
+    correctOf: "correct out of",
+    questions: "Questions"
   },
   zh: {
     appTitle: "威斯敏斯特小要理问答",
@@ -55,5 +59,9 @@ export const UI_TEXT = {
     emptySaved: "暂无收藏问题。点击星号图标收藏问题以便日后学习。",
     proofReference: "证明经文",
     tabToReviewAnswer: "点击查看答案",
+    answer: "答案",
+    question: "问题",
+    correctOf: "正确/总计",
+    questions: "个问题"
   }
 };

@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Search, 
-  BookOpen, 
-  BrainCircuit, 
-  ScrollText
+import {
+  BookOpen,
+  BrainCircuit,
+  ScrollText,
+  Search
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { UI_TEXT } from './constants';
-import { Language } from './types';
 import { DATA_EN } from './data/wcs.en';
 import { DATA_ZH } from './data/wcs.zh';
+import { Language } from './types';
 import { BrowseView } from './views/BrowseView';
 import { QuizView } from './views/QuizView';
 
@@ -87,7 +87,7 @@ function App() {
               title="Switch Language"
             >
               <span className="font-bold text-xs border border-current rounded px-1 py-0.5">
-                {language.toUpperCase()}
+                {language === "en" ? "中文" : "English"}
               </span>
             </button>
           </div>
