@@ -3,6 +3,7 @@ export const UI_TEXT = {
 		appTitle: "Westminster Shorter Catechism",
 		browse: "Browse",
 		quiz: "Quiz",
+		ai: "AI Agent",
 		searchPlaceholder: "Search questions...",
 		questionLabel: "Question",
 		answerLabel: "Answer",
@@ -32,11 +33,15 @@ export const UI_TEXT = {
 		question: "Question",
 		correctOf: "correct out of",
 		questions: "Questions",
+		aiPlaceholder: "Ask a question about the Westminster Shorter Catechism...",
+		aiThinking: "Thinking...",
+		aiSend: "Send",
 	},
 	zh: {
 		appTitle: "威斯敏斯特小要理问答",
 		browse: "浏览",
 		quiz: "测验",
+		ai: "AI助手",
 		searchPlaceholder: "搜索问题...",
 		questionLabel: "问题",
 		answerLabel: "回答",
@@ -64,5 +69,11 @@ export const UI_TEXT = {
 		question: "问题",
 		correctOf: "正确/总计",
 		questions: "个问题",
+		aiPlaceholder: "询问关于威斯敏斯特小要理问答的问题...",
+		aiThinking: "思考中...",
+		aiSend: "发送",
 	},
 };
+
+export const GEMINI_MODEL_FAST = "gemini-2.5-flash";
+export const GEMINI_MODEL_SMART = "gemini-3-flash-preview";

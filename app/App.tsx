@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, BrainCircuit, ScrollText, Search } from "lucide-react";
+import { BookOpen, BrainCircuit, ScrollText, Search, Bot } from "lucide-react";
 import { useEffect, useState } from "react";
 import { UI_TEXT } from "./constants";
 import { DATA_EN } from "./data/wcs.en";
@@ -8,6 +8,7 @@ import { DATA_ZH } from "./data/wcs.zh";
 import { Language } from "../types";
 import { BrowseView } from "./views/BrowseView";
 import { QuizView } from "./views/QuizView";
+import { AiView } from "./views/AiView";
 
 function App() {
 	// Load initial state from local storage
@@ -27,7 +28,7 @@ function App() {
 		return [];
 	});
 
-	const [view, setView] = useState<"browse" | "quiz">("browse");
+	const [view, setView] = useState<"browse" | "quiz" | "ai">("browse");
 	const [searchQuery, setSearchQuery] = useState("");
 
 	// Determine which dataset to use
@@ -110,8 +111,10 @@ function App() {
 						bookmarks={bookmarks}
 						onToggleBookmark={toggleBookmark}
 					/>
-				) : (
+				) : view === "quiz" ? (
 					<QuizView data={data} language={language} />
+				) : (
+					<AiView data={data} language={language} />
 				)}
 			</main>
 
@@ -144,6 +147,20 @@ function App() {
 				>
 					<BrainCircuit size={18} />
 					<span className="text-sm">{t.quiz}</span>
+				</button>
+				<button
+					onClick={() => {
+						setView("ai");
+						window.scrollTo({ top: 0, behavior: "smooth" });
+					}}
+					className={`flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 ${
+						view === "ai"
+							? "bg-blue-500 text-white shadow-md font-semibold"
+							: "text-slate-400 hover:text-white"
+					}`}
+				>
+					<Bot size={18} />
+					<span className="text-sm">{t.ai}</span>
 				</button>
 			</div>
 		</div>
