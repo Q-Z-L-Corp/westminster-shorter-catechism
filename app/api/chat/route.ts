@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { DATA_EN } from "../../data/wcs.en";
 import { DATA_ZH } from "../../data/wcs.zh";
-import { QuestionData } from "../../../types";
+import { ChatHistory, QuestionData } from "../../../types";
 import { GEMINI_MODEL_FAST, GEMINI_MODEL_SMART } from "../../constants";
 
 const apiKey = process.env.GEMINI_API_KEY!;
@@ -10,51 +10,75 @@ const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: 10000 } });
 
 export async function POST(request: NextRequest) {
 	try {
-		const { query, language }: { query: string; language: "en" | "zh" } =
+		const {
+			message,
+			language,
+			history,
+		}: { message: string; language: "en" | "zh"; history?: ChatHistory[] } =
 			await request.json();
 
-		if (!query) {
-			return NextResponse.json({ error: "Query is required" }, { status: 400 });
+		if (!message) {
+			return NextResponse.json(
+				{ error: "Message is required" },
+				{ status: 400 },
+			);
 		}
 
 		const data = language === "en" ? DATA_EN : DATA_ZH;
 
 		// Find relevant questions
-		const relevantQuestions = findRelevantQuestions(query, data);
+		const relevantQuestions = findRelevantQuestions(message, data);
 
 		// Prepare context
 		const context = prepareContext(relevantQuestions, language);
 
-		const prompt =
+		const systemInstruction =
 			language === "en"
-				? `You are a helpful AI assistant specializing in the Westminster Shorter Catechism. Use the provided context to answer questions accurately and helpfully. If the question cannot be answered from the context, say so politely and suggest looking at the catechism questions.
+				? "You are a helpful AI assistant specializing in the Westminster Shorter Catechism. Use the provided context to answer questions accurately and helpfully. If the question cannot be answered from the context, say so politely and suggest looking at the catechism questions."
+				: "你是一个专门研究威斯敏斯特小要理问答的有帮助的AI助手。使用提供的上下文准确而有帮助地回答问题。如果问题无法从上下文中回答，请礼貌地说出来并建议查看要理问答的问题。";
+
+		const augmentMessage =
+			language === "en"
+				? `
 
 Context:
 ${context}
 
-User Question: ${query}
+User Question: ${message}
 
 Please provide a clear, accurate answer based on the catechism. Keep your response concise but informative.`
-				: `你是一个专门研究威斯敏斯特小要理问答的有帮助的AI助手。使用提供的上下文准确而有帮助地回答问题。如果问题无法从上下文中回答，请礼貌地说出来并建议查看要理问答的问题。
+				: `
 
 上下文：
 ${context}
 
-用户问题：${query}
+用户问题：${message}
 
 请基于要理问答提供清晰、准确的答案。保持回答简洁但信息丰富。`;
 
 		let result;
 		try {
-			result = await ai.models.generateContent({
+			const chat = ai.chats.create({
 				model: GEMINI_MODEL_SMART,
-				contents: prompt,
+				history: history || [],
+				config: {
+					systemInstruction,
+				},
+			});
+			result = await chat.sendMessage({
+				message: augmentMessage,
 			});
 		} catch (error) {
 			// Fallback to fast model if smart model fails (e.g., quota reached)
-			result = await ai.models.generateContent({
+			const chat = ai.chats.create({
 				model: GEMINI_MODEL_FAST,
-				contents: prompt,
+				history: history || [],
+				config: {
+					systemInstruction,
+				},
+			});
+			result = await chat.sendMessage({
+				message,
 			});
 		}
 
@@ -70,10 +94,10 @@ ${context}
 
 // Helper function to find relevant questions
 function findRelevantQuestions(
-	query: string,
+	message: string,
 	data: QuestionData[],
 ): QuestionData[] {
-	const lowerQuery = query.toLowerCase();
+	const lowerQuery = message.toLowerCase();
 	const relevant: QuestionData[] = [];
 
 	for (const question of data) {

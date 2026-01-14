@@ -4,22 +4,18 @@ import { Send, Bot } from "lucide-react";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { QuestionData } from "../../types";
+import { ChatHistory, ChatMessage, QuestionData } from "../../types";
 import { Language } from "../../types";
 import { Card } from "../components/Card";
+import build from "next/dist/build";
 
 interface AiViewProps {
 	data: QuestionData[];
 	language: Language;
 }
 
-interface Message {
-	role: "user" | "assistant";
-	content: string;
-}
-
 interface MessageRendererProps {
-	message: Message;
+	message: ChatMessage;
 	data: QuestionData[];
 	language: Language;
 }
@@ -30,7 +26,7 @@ function MessageRenderer({ message, data, language }: MessageRendererProps) {
 	}
 
 	// For assistant messages, parse for question references and render with markdown
-	const parts = parseMessageForQuestions(message.content, data);
+	const parts = parseMessageForQuestions(message.text, data);
 
 	return (
 		<div className="text-sm space-y-4">
@@ -166,10 +162,10 @@ function parseMessageForQuestions(
 }
 
 export function AiView({ data, language }: AiViewProps) {
-	const [messages, setMessages] = useState<Message[]>([
+	const [messages, setMessages] = useState<ChatMessage[]>([
 		{
 			role: "assistant",
-			content:
+			text:
 				language === "en"
 					? "Hello! I'm an AI assistant powered by Gemini 3. I can help you understand the Westminster Shorter Catechism. Ask me any questions about the catechism, theology, or related topics!"
 					: "你好！我是由 Gemini 3 驱动的 AI 助手。我可以帮助你理解威斯敏斯特小要理问答。请问我任何关于要理问答、神学或相关主题的问题！",
@@ -181,19 +177,29 @@ export function AiView({ data, language }: AiViewProps) {
 	const handleSend = async () => {
 		if (!input.trim() || isLoading) return;
 
-		const userMessage: Message = { role: "user", content: input };
+		const userMessage: ChatMessage = { role: "user", text: input };
 		setMessages((prev) => [...prev, userMessage]);
 		setInput("");
 		setIsLoading(true);
 
 		try {
 			// Call our API route
+			const buildChatHistory = (): ChatHistory[] => {
+				return messages.map((m) => ({
+					role: m.role,
+					parts: [{ text: m.text }],
+				}));
+			};
 			const response = await fetch("/api/chat", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ query: input, language }),
+				body: JSON.stringify({
+					message: input,
+					language,
+					history: buildChatHistory(),
+				}),
 			});
 
 			if (!response.ok) {
@@ -201,16 +207,16 @@ export function AiView({ data, language }: AiViewProps) {
 			}
 
 			const data = await response.json();
-			const assistantMessage: Message = {
+			const assistantMessage: ChatMessage = {
 				role: "assistant",
-				content: data.response,
+				text: data.response,
 			};
 			setMessages((prev) => [...prev, assistantMessage]);
 		} catch (error) {
 			console.error("Error calling Gemini API:", error);
-			const errorMessage: Message = {
+			const errorMessage: ChatMessage = {
 				role: "assistant",
-				content:
+				text:
 					language === "en"
 						? "Sorry, I encountered an error. Please try again."
 						: "抱歉，我遇到了一个错误。请重试。",
