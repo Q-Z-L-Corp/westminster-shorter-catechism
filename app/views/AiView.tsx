@@ -22,7 +22,7 @@ interface MessageRendererProps {
 
 function MessageRenderer({ message, data, language }: MessageRendererProps) {
 	if (message.role === "user") {
-		return <p className="text-sm whitespace-pre-wrap">{message.content}</p>;
+		return <p className="text-sm whitespace-pre-wrap">{message.text}</p>;
 	}
 
 	// For assistant messages, parse for question references and render with markdown
