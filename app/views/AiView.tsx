@@ -7,7 +7,6 @@ import remarkGfm from "remark-gfm";
 import { ChatHistory, ChatMessage, QuestionData } from "../../types";
 import { Language } from "../../types";
 import { Card } from "../components/Card";
-import build from "next/dist/build";
 
 interface AiViewProps {
 	data: QuestionData[];
@@ -112,6 +111,7 @@ function parseMessageForQuestions(
 		content?: string;
 		questionId?: number;
 	}> = [];
+	if (!content) return parts;
 	let lastIndex = 0;
 
 	// Regex to match question references like "Question 1", "Q1", "question #1", etc.
@@ -164,7 +164,7 @@ function parseMessageForQuestions(
 export function AiView({ data, language }: AiViewProps) {
 	const [messages, setMessages] = useState<ChatMessage[]>([
 		{
-			role: "assistant",
+			role: "model",
 			text:
 				language === "en"
 					? "Hello! I'm an AI assistant powered by Gemini 3. I can help you understand the Westminster Shorter Catechism. Ask me any questions about the catechism, theology, or related topics!"
@@ -208,14 +208,14 @@ export function AiView({ data, language }: AiViewProps) {
 
 			const data = await response.json();
 			const assistantMessage: ChatMessage = {
-				role: "assistant",
-				text: data.response,
+				role: "model",
+				text: data.reply,
 			};
 			setMessages((prev) => [...prev, assistantMessage]);
 		} catch (error) {
 			console.error("Error calling Gemini API:", error);
 			const errorMessage: ChatMessage = {
-				role: "assistant",
+				role: "model",
 				text:
 					language === "en"
 						? "Sorry, I encountered an error. Please try again."

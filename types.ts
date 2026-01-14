@@ -26,7 +26,7 @@ export enum QuizState {
 }
 
 export interface ChatMessage {
-	role: "user" | "assistant";
+	role: "user" | "model";
 	text: string;
 }
 

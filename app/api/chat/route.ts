@@ -82,7 +82,7 @@ ${context}
 			});
 		}
 
-		return NextResponse.json({ response: result.text });
+		return NextResponse.json({ reply: result.text });
 	} catch (error) {
 		console.error("Error in chat API:", error);
 		return NextResponse.json(
